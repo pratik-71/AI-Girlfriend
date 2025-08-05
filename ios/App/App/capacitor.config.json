@@ -21,9 +21,5 @@
 			"useDialog": true
 		}
 	},
-	"packageClassList": [
-		"KeyboardPlugin",
-		"SplashScreenPlugin",
-		"StatusBarPlugin"
-	]
+	"packageClassList": []
 }
