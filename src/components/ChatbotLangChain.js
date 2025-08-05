@@ -8,10 +8,24 @@ const ChatbotLangChain = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [memory, setMemory] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Static API key
   const apiKey = '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';
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,6 +34,14 @@ const ChatbotLangChain = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-resize textarea for mobile
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [inputMessage]);
 
   // Initialize memory system
   useEffect(() => {
@@ -278,22 +300,22 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
       </div>
 
       <div className="relative z-10 h-full flex flex-col">
-        {/* Professional Top Left Header */}
-        <div className="flex-shrink-0 p-4">
+        {/* Mobile-optimized Header */}
+        <div className={`flex-shrink-0 ${isMobile ? 'p-3' : 'p-4'}`}>
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-white text-lg">💕</span>
+                <div className={`${isMobile ? 'w-7 h-7' : 'w-8 h-8'} bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg`}>
+                  <span className={`${isMobile ? 'text-base' : 'text-lg'} text-white`}>💕</span>
                 </div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-400 rounded-full animate-pulse"></div>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white leading-tight">
+                <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-white leading-tight`}>
                   <span className="bg-gradient-to-r from-pink-400 to-pink-500 bg-clip-text text-transparent">My AI</span>
                   <span className="bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent"> Girlfriend</span>
                 </h1>
-                <p className="text-xs text-gray-400 font-medium">Professional & Human-like 💖</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-400 font-medium`}>Professional & Human-like 💖</p>
               </div>
             </div>
             <div className="flex items-center space-x-1 ml-auto">
@@ -305,24 +327,24 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1 min-h-0 px-4 pb-4">
+        <div className={`flex-1 min-h-0 ${isMobile ? 'px-2 pb-2' : 'px-4 pb-4'}`}>
           <div className="h-full">
             <div className="h-full bg-black/50 backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col border border-pink-500/25">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className={`flex-1 overflow-y-auto ${isMobile ? 'p-3' : 'p-4'}`}>
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-300 h-full flex flex-col justify-center">
                     <div className="relative mb-6">
-                      <div className="text-5xl animate-bounce">💕</div>
+                      <div className={`${isMobile ? 'text-4xl' : 'text-5xl'} animate-bounce`}>💕</div>
                       <div className="absolute -top-2 -right-2 w-4 h-4 bg-pink-500 rounded-full animate-ping"></div>
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-3">Hello, my love! 💖</h2>
-                    <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
+                    <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-white mb-3`}>Hello, my love! 💖</h2>
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-400 mb-6 max-w-md mx-auto`}>
                       {memory ? 'I\'m so happy to see you! How are you doing today?' : 'Initializing personality...'}
                     </p>
                     {memory && (
                       <div className="inline-block p-4 bg-gradient-to-r from-pink-500/15 to-purple-500/15 rounded-xl border border-pink-500/25 shadow-lg backdrop-blur-sm">
-                        <p className="text-sm text-pink-300 font-medium">💝 Try saying: "Hi babe, how are you?"</p>
+                        <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-pink-300 font-medium`}>💝 Try saying: "Hi babe, how are you?"</p>
                       </div>
                     )}
                   </div>
@@ -335,20 +357,20 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <div
-                          className={`max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 rounded-xl shadow-lg ${
+                          className={`${isMobile ? 'max-w-[85%]' : 'max-w-xs sm:max-w-sm md:max-w-md'} px-4 py-3 rounded-xl shadow-lg ${
                             message.role === 'user'
                               ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-500/25'
                               : 'bg-gradient-to-r from-gray-800/90 to-gray-900/90 text-gray-100 border border-pink-500/20 backdrop-blur-sm shadow-gray-900/50'
                           }`}
                         >
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                          <p className="text-xs opacity-60 mt-2 font-medium">{message.timestamp}</p>
+                          <p className={`${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed`}>{message.content}</p>
+                          <p className={`${isMobile ? 'text-xs' : 'text-xs'} opacity-60 mt-2 font-medium`}>{message.timestamp}</p>
                         </div>
                       </div>
                     ))}
                     {isLoading && (
                       <div className="flex justify-start animate-fade-in">
-                        <div className="bg-gradient-to-r from-gray-800/90 to-gray-900/90 text-gray-100 max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 rounded-xl border border-pink-500/20 shadow-lg backdrop-blur-sm">
+                        <div className={`${isMobile ? 'max-w-[85%]' : 'max-w-xs sm:max-w-sm md:max-w-md'} bg-gradient-to-r from-gray-800/90 to-gray-900/90 text-gray-100 px-4 py-3 rounded-xl border border-pink-500/20 shadow-lg backdrop-blur-sm`}>
                           <div className="flex items-center space-x-3">
                             <div className="flex space-x-1">
                               <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce"></div>
@@ -365,28 +387,30 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
                 )}
               </div>
 
-              {/* Elegant Input Area */}
+              {/* Mobile-optimized Input Area */}
               <div className="border-t border-pink-500/25 p-4 bg-gradient-to-r from-gray-900/80 to-black/80 rounded-b-2xl backdrop-blur-sm">
                 <div className="flex space-x-3">
                   <textarea
+                    ref={textareaRef}
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={memory ? "Tell me something sweet... 💕" : "Initializing..."}
-                    className="flex-1 px-4 py-3 border border-pink-500/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none bg-black/50 backdrop-blur-sm text-sm font-medium transition-all duration-300 hover:border-pink-400 focus:border-pink-400 text-white placeholder-gray-400 shadow-inner"
+                    className={`flex-1 px-4 py-3 border border-pink-500/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none bg-black/50 backdrop-blur-sm font-medium transition-all duration-300 hover:border-pink-400 focus:border-pink-400 text-white placeholder-gray-400 shadow-inner ${isMobile ? 'text-sm' : 'text-sm'}`}
                     rows="1"
                     disabled={!memory}
+                    style={{ minHeight: '44px', maxHeight: '120px' }}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!inputMessage.trim() || !memory || isLoading}
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 px-5 rounded-xl transition-all duration-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 text-lg min-w-[60px] border border-pink-400/30"
+                    className={`bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 px-5 rounded-xl transition-all duration-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-pink-400/30 ${isMobile ? 'text-base min-w-[50px]' : 'text-lg min-w-[60px]'}`}
                   >
                     {isLoading ? '💕' : '💝'}
                   </button>
                 </div>
-                <p className="text-xs text-pink-400 mt-3 text-center font-medium">
-                  Press Enter to send, Shift+Enter for new line 💖
+                <p className={`${isMobile ? 'text-xs' : 'text-xs'} text-pink-400 mt-3 text-center font-medium`}>
+                  {isMobile ? 'Tap to send 💖' : 'Press Enter to send, Shift+Enter for new line 💖'}
                 </p>
               </div>
             </div>
