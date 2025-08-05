@@ -6,14 +6,71 @@ const ChatbotLangChain = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [memory, setMemory] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
-  // Static API key
-  const apiKey = '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';
+  // API Configuration - You can replace this with your own API key
+  const apiKey = process.env.REACT_APP_OPENROUTER_API_KEY || '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';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Detect mobile device and handle keyboard
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Handle keyboard events for mobile
+    const handleFocus = () => {
+      if (isMobile) {
+        setKeyboardOpen(true);
+        // Add padding to prevent content from being hidden
+        document.body.style.paddingBottom = '300px';
+        setTimeout(() => {
+          scrollToBottom();
+        }, 300);
+      }
+    };
+    
+    const handleBlur = () => {
+      if (isMobile) {
+        setKeyboardOpen(false);
+        document.body.style.paddingBottom = '0px';
+      }
+    };
+    
+    // Add event listeners to textarea
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.addEventListener('focus', handleFocus);
+      textarea.addEventListener('blur', handleBlur);
+    }
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      if (textarea) {
+        textarea.removeEventListener('focus', handleFocus);
+        textarea.removeEventListener('blur', handleBlur);
+      }
+      document.body.style.paddingBottom = '0px';
+    };
+  }, [isMobile]);
+
+  // Auto-resize textarea for mobile
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [inputMessage]);
 
   useEffect(() => {
     scrollToBottom();
@@ -188,11 +245,14 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Show error message to user
       const errorMessage = {
         role: 'assistant',
         content: 'Sorry babe, I\'m having trouble connecting right now. Can you try again in a moment? 💕',
         timestamp: new Date().toLocaleTimeString()
       };
+      
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -254,7 +314,12 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
   }, [memory]);
 
   return (
-    <div className="h-screen w-screen bg-black relative overflow-hidden">
+    <div className={`${isMobile && keyboardOpen ? 'h-screen' : 'h-screen'} w-screen bg-black relative overflow-hidden`} style={{
+      ...(isMobile && keyboardOpen && {
+        paddingBottom: '300px',
+        height: '100vh'
+      })
+    }}>
       {/* Elegant background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-500/8 via-purple-500/8 to-pink-500/8"></div>
@@ -361,13 +426,22 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
               <div className="border-t border-pink-500/25 p-4 bg-gradient-to-r from-gray-900/80 to-black/80 rounded-b-2xl backdrop-blur-sm">
                 <div className="flex space-x-3">
                   <textarea
+                    ref={textareaRef}
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={memory ? "Tell me something sweet... 💕" : "Initializing..."}
-                    className="flex-1 px-4 py-3 border border-pink-500/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none bg-black/50 backdrop-blur-sm text-sm font-medium transition-all duration-300 hover:border-pink-400 focus:border-pink-400 text-white placeholder-gray-400 shadow-inner"
+                    className={`flex-1 px-4 py-3 border border-pink-500/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none bg-black/50 backdrop-blur-sm font-medium transition-all duration-300 hover:border-pink-400 focus:border-pink-400 text-white placeholder-gray-400 shadow-inner ${isMobile ? 'text-sm' : 'text-sm'}`}
                     rows="1"
                     disabled={!memory}
+                    style={{ 
+                      minHeight: '44px', 
+                      maxHeight: '120px',
+                      ...(keyboardOpen && isMobile && { 
+                        position: 'relative',
+                        zIndex: 1000 
+                      })
+                    }}
                   />
                   <button
                     onClick={sendMessage}

@@ -1,70 +1,134 @@
-# Getting Started with Create React App
+# AI Chatbot Mobile App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A beautiful, mobile-optimized AI chatbot built with React and Capacitor.js that can be deployed as a native mobile app.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- 💕 **AI Girlfriend Chatbot** - Human-like conversational AI
+- 📱 **Mobile Optimized** - Responsive design for mobile devices
+- 🎨 **Beautiful UI** - Modern gradient design with animations
+- 🔄 **Memory System** - Remembers conversations and user preferences
+- 📱 **Native Mobile App** - Can be built for Android and iOS
 
-### `npm start`
+## API Configuration
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The chatbot uses OpenRouter API for AI responses. To fix the "User not found" error:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Option 1: Get a Free API Key
+1. Visit [OpenRouter.ai](https://openrouter.ai/keys)
+2. Sign up for a free account
+3. Generate an API key
+4. Create a `.env` file in your project root:
+   ```
+   REACT_APP_OPENROUTER_API_KEY=your_api_key_here
+   ```
+5. Restart the development server: `npm start`
 
-### `npm test`
+### Option 2: Use Fallback Mode
+The app now includes fallback responses when the API is unavailable, so it will still work even without a valid API key.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Option 3: Use Your Own API Key
+Replace the API key in `src/components/ChatbotLangChain.js`:
+```javascript
+const apiKey = 'your_api_key_here';
+```
 
-### `npm run build`
+## Mobile App Development
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+This project uses **Capacitor.js** to convert the React web app into native mobile applications.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Node.js and npm
+- Android Studio (for Android development)
+- Xcode (for iOS development, macOS only)
 
-### `npm run eject`
+### Available Scripts
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+# Build and sync with mobile platforms
+npm run cap:build
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Open Android Studio
+npm run cap:android
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# Open Xcode (macOS only)
+npm run cap:ios
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Run on Android device/emulator
+npm run cap:run:android
 
-## Learn More
+# Run on iOS device/simulator (macOS only)
+npm run cap:run:ios
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Sync changes to mobile platforms
+npm run cap:sync
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Building for Android
 
-### Code Splitting
+1. Install Android Studio
+2. Set up Android SDK
+3. Run: `npm run cap:android`
+4. Build and run in Android Studio
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Building for iOS (macOS only)
 
-### Analyzing the Bundle Size
+1. Install Xcode
+2. Run: `npm run cap:ios`
+3. Build and run in Xcode
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Web Development
 
-### Making a Progressive Web App
+### Getting Started
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. Install dependencies:
+```bash
+npm install
+```
 
-### Advanced Configuration
+2. Start the development server:
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+3. Build for production:
+```bash
+npm run build
+```
 
-### Deployment
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```
+ai_chatbot/
+├── src/
+│   ├── components/
+│   │   └── ChatbotLangChain.js  # Main chatbot component
+│   ├── App.js                    # Main app component
+│   └── index.js                  # Entry point
+├── android/                      # Android native project
+├── ios/                         # iOS native project
+├── capacitor.config.ts           # Capacitor configuration
+└── package.json
+```
 
-### `npm run build` fails to minify
+## Mobile Optimizations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Responsive design for different screen sizes
+- Touch-friendly interface
+- Auto-resizing text input
+- Mobile-specific UI adjustments
+- Native keyboard handling
+- Splash screen and status bar integration
+
+## Technologies Used
+
+- **React** - Frontend framework
+- **Capacitor.js** - Mobile app framework
+- **Tailwind CSS** - Styling
+- **LangChain** - AI conversation management
+- **Axios** - HTTP requests
+
+## License
+
+This project is for educational purposes.
