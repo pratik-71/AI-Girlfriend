@@ -7,18 +7,23 @@ const ChatbotLangChain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [memory, setMemory] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
   // API Configuration - You can replace this with your own API key
-  const apiKey = process.env.REACT_APP_OPENROUTER_API_KEY || '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';
+  const apiKey = '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';
+  
+  // Alternative API endpoints
+  const API_ENDPOINTS = {
+    openrouter: 'https://openrouter.ai/api/v1/chat/completions',
+    // Add more endpoints here if needed
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Detect mobile device and handle keyboard
+  // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
@@ -28,41 +33,10 @@ const ChatbotLangChain = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Handle keyboard events for mobile
-    const handleFocus = () => {
-      if (isMobile) {
-        setKeyboardOpen(true);
-        // Add padding to prevent content from being hidden
-        document.body.style.paddingBottom = '300px';
-        setTimeout(() => {
-          scrollToBottom();
-        }, 300);
-      }
-    };
-    
-    const handleBlur = () => {
-      if (isMobile) {
-        setKeyboardOpen(false);
-        document.body.style.paddingBottom = '0px';
-      }
-    };
-    
-    // Add event listeners to textarea
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.addEventListener('focus', handleFocus);
-      textarea.addEventListener('blur', handleBlur);
-    }
-    
     return () => {
       window.removeEventListener('resize', checkMobile);
-      if (textarea) {
-        textarea.removeEventListener('focus', handleFocus);
-        textarea.removeEventListener('blur', handleBlur);
-      }
-      document.body.style.paddingBottom = '0px';
     };
-  }, [isMobile]);
+  }, []);
 
   // Auto-resize textarea for mobile
   useEffect(() => {
@@ -246,10 +220,26 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // Show error message to user
+      // Provide specific error messages based on the error
+      let errorContent = 'Sorry babe, I\'m having trouble connecting right now. Can you try again in a moment? 💕';
+      
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 401) {
+          errorContent = 'API key is invalid. Please check your OpenRouter API key. 💕';
+        } else if (error.response.status === 429) {
+          errorContent = 'Too many requests. Please wait a moment and try again. 💕';
+        } else if (error.response.status >= 500) {
+          errorContent = 'Server is having issues. Please try again later. 💕';
+        }
+      } else if (error.request) {
+        // Network error
+        errorContent = 'Network connection issue. Please check your internet and try again. 💕';
+      }
+      
       const errorMessage = {
         role: 'assistant',
-        content: 'Sorry babe, I\'m having trouble connecting right now. Can you try again in a moment? 💕',
+        content: errorContent,
         timestamp: new Date().toLocaleTimeString()
       };
       
@@ -314,12 +304,7 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
   }, [memory]);
 
   return (
-    <div className={`${isMobile && keyboardOpen ? 'h-screen' : 'h-screen'} w-screen bg-black relative overflow-hidden`} style={{
-      ...(isMobile && keyboardOpen && {
-        paddingBottom: '300px',
-        height: '100vh'
-      })
-    }}>
+    <div className="h-screen w-screen bg-black relative overflow-hidden">
       {/* Elegant background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-500/8 via-purple-500/8 to-pink-500/8"></div>
@@ -436,11 +421,7 @@ REMEMBER: You're a real girlfriend, not an AI assistant. Be human, emotional, an
                     disabled={!memory}
                     style={{ 
                       minHeight: '44px', 
-                      maxHeight: '120px',
-                      ...(keyboardOpen && isMobile && { 
-                        position: 'relative',
-                        zIndex: 1000 
-                      })
+                      maxHeight: '120px'
                     }}
                   />
                   <button
